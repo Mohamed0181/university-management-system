@@ -1,0 +1,67 @@
+<odoo>
+    <!-- Action for Student Fees -->
+    <record id="action_student_fee" model="ir.actions.act_window">
+        <field name="name">Student Fees</field>
+        <field name="res_model">student.fee</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Tree View for Student Fees -->
+    <record id="view_student_fee_tree" model="ir.ui.view">
+        <field name="name">student.fee.tree</field>
+        <field name="model">student.fee</field>
+        <field name="arch" type="xml">
+            <list string="Student Fees">
+                <field name="student_id" readonly="payment_status == 'paid'"/>
+                <field name="semester_id" readonly="1"/>
+                <field name="batch_id" readonly="payment_status == 'paid'"/>
+                <field name="academic_year_id" readonly="payment_status == 'paid'"/>
+                <field name="amount_due" readonly="payment_status == 'paid'"/>
+                <field name="amount_paid" readonly="payment_status == 'paid'"/>
+                <field name="balance" readonly="1"/>
+                <field name="payment_status" widget="badge"
+                       decoration-danger="payment_status == 'unpaid'"
+                       decoration-warning="payment_status == 'partial'"
+                       decoration-success="payment_status == 'paid'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Student Fee -->
+    <record id="view_student_fee_form" model="ir.ui.view">
+        <field name="name">student.fee.form</field>
+        <field name="model">student.fee</field>
+        <field name="arch" type="xml">
+            <form string="Student Fee">
+                <sheet>
+                    <group>
+                        <group string="Student Information">
+                            <field name="student_id" options="{'no_create': True}"
+                                   readonly="payment_status == 'paid'"/>
+                            <field name="batch_id" options="{'no_create': True}"
+                                   readonly="payment_status == 'paid'"/>
+                            <field name="semester_id" options="{'no_create': True}"
+                                   readonly="payment_status == 'paid'"/>
+                            <field name="academic_year_id" options="{'no_create': True}"
+                                   readonly="payment_status == 'paid'"/>
+                        </group>
+                        <group string="Payment Details">
+                            <field name="amount_due" readonly="1"/>
+                            <field name="amount_paid" />
+                            <field name="balance" readonly="1"/>
+                            <field name="payment_status" widget="badge" readonly="1"/>
+                            <field name="payment_date" readonly="payment_status == 'paid'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Menu Item for Student Fees -->
+    <menuitem id="menu_student_fee"
+              name="Fees"
+              parent="menu_university_admission_root"
+              action="action_student_fee"
+              sequence="20"/>
+</odoo>

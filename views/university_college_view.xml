@@ -1,0 +1,45 @@
+<odoo>
+    <!-- List View-->
+    <record id="university_college_list" model="ir.ui.view">
+        <field name="name">University College List</field>
+        <field name="model">university.college</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+
+        </field>
+    </record>
+    <!--Form view -->
+
+    <record id="university_college_from" model="ir.ui.view">
+        <field name="name">University College Form</field>
+        <field name="model">university.college</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--Action -->
+    <record id="university_college_action" model="ir.actions.act_window">
+        <field name="name">College</field>
+        <field name="res_model">university.college</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <!-- menu item-->
+
+    <menuitem id="university_college_view"
+              name="College"
+              parent="menu_university_admission_root"
+              action="university_college_action"
+    />
+</odoo>

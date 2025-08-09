@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- قالب تقرير جدول المحاضرات -->
+        <template id="report_university_timetable" name="University Timetable Report">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-foreach="docs" t-as="timetable">
+                            <!-- عنوان التقرير -->
+                            <div class="text-center mb-4">
+                                <h1 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-bottom: 30px;">
+                                     جدول المحاضرات: <span t-field="timetable.name"/>
+                                </h1>
+                            </div>
+
+                            <!-- معلومات الجدول في تنسيق محسن -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h3 style="color: #34495e; margin-bottom: 20px;">🎓 معلومات الجدول</h3>
+                                    <table class="table table-borderless" style="background-color: #f8f9fa; direction: rtl;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 33%; text-align: right;"><span t-field="timetable.college_id.name"/> : <span style="font-weight: bold; color: #2c3e50;">الكلية</span></td>
+                                                <td style="width: 33%; text-align: right;"><span t-field="timetable.batch_id.name"/> : <span style="font-weight: bold; color: #2c3e50;">الفرقة</span></td>
+                                                <td style="width: 34%; text-align: right;"><span t-field="timetable.academic_year_id.name"/> : <span style="font-weight: bold; color: #2c3e50;">العام الدراسي</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- تحديد الأيام -->
+                            <t t-set="days" t-value="[
+                                ('الإثنين', timetable.mon_timetable_ids, '#E8F4FD'),
+                                ('الثلاثاء', timetable.tue_timetable_ids, '#FFF2E8'),
+                                ('الأربعاء', timetable.wed_timetable_ids, '#E8F5E8'),
+                                ('الخميس', timetable.thur_timetable_ids, '#F5E8F5'),
+                                ('الجمعة', timetable.fri_timetable_ids, '#FFF8E8'),
+                                ('السبت', timetable.sat_timetable_ids, '#F0F8F0')
+                            ]"/>
+
+                            <!-- عنوان الجدول -->
+                            <h3 style="color: #34495e; margin: 30px 0 20px 0;"> الجدول الأسبوعي</h3>
+
+                            <!-- الجدول الرئيسي -->
+                            <table class="table table-bordered" style="width:100%; margin-top: 10px; border-collapse: collapse;">
+                                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                    <tr>
+                                        <th style="text-align: center; padding: 15px; font-size: 14px; font-weight: bold;"> اليوم</th>
+                                        <th style="text-align: center; padding: 15px; font-size: 14px; font-weight: bold;"> الفترة</th>
+                                        <th style="text-align: center; padding: 15px; font-size: 14px; font-weight: bold;"> المادة</th>
+                                        <th style="text-align: center; padding: 15px; font-size: 14px; font-weight: bold;"> من</th>
+                                        <th style="text-align: center; padding: 15px; font-size: 14px; font-weight: bold;"> إلى</th>
+                                        <th style="text-align: center; padding: 15px; font-size: 14px; font-weight: bold;"> الدكتور</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="days" t-as="day">
+                                        <t t-if="day[1]">
+                                            <t t-set="first_row" t-value="True"/>
+                                            <t t-foreach="day[1]" t-as="line">
+                                                <tr style="background-color: {day[2]};">
+                                                    <td style="text-align: center; padding: 12px; font-weight: bold; color: #2c3e50; border-right: 4px solid #3498db;">
+                                                        <t t-if="first_row">
+                                                            <t t-esc="day[0]"/>
+                                                            <t t-set="first_row" t-value="False"/>
+                                                        </t>
+                                                    </td>
+                                                    <td style="text-align: center; padding: 12px; font-weight: 500;">
+                                                        <span style="background-color: #3498db; color: white; padding: 4px 8px; border-radius: 15px; font-size: 12px;">
+                                                            <t t-esc="line.period_id.name"/>
+                                                        </span>
+                                                    </td>
+                                                    <td style="padding: 12px; font-weight: bold; color: #2c3e50;">
+                                                        <t t-esc="line.course_id.name"/>
+                                                    </td>
+                                                    <td style="text-align: center; padding: 12px; color: #27ae60; font-weight: bold;">
+                                                         <t t-esc="line.time_from_str"/>
+                                                    </td>
+                                                    <td style="text-align: center; padding: 12px; color: #e74c3c; font-weight: bold;">
+                                                         <t t-esc="line.time_till_str"/>
+                                                    </td>
+                                                    <td style="padding: 12px; color: #8e44ad; font-weight: 500;">
+                                                        <t t-esc="line.faculty_id.name"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <!-- إذا لم توجد محاضرات في هذا اليوم -->
+                                            <tr style="background-color: #f8f9fa;">
+                                                <td style="text-align: center; padding: 15px; font-weight: bold; color: #2c3e50; border-right: 4px solid #95a5a6;">
+                                                    <t t-esc="day[0]"/>
+                                                </td>
+                                                <td colspan="5" style="text-align: center; padding: 15px; color: #7f8c8d; font-style: italic;">
+                                                     لا توجد محاضرات في هذا اليوم
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                            <!-- إحصائيات سريعة -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h4 style="color: #34495e; margin-bottom: 15px;"> إحصائيات الجدول</h4>
+                                    <table class="table table-borderless" style="background-color: #ecf0f1; direction: rtl;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 50%; text-align: right;">
+                                                    <t t-set="total_lectures" t-value="len(timetable.mon_timetable_ids) + len(timetable.tue_timetable_ids) + len(timetable.wed_timetable_ids) + len(timetable.thur_timetable_ids) + len(timetable.fri_timetable_ids) + len(timetable.sat_timetable_ids)"/>
+                                                    <t t-esc="total_lectures"/> : <span style="font-weight: bold; color: #3498db;">إجمالي المحاضرات</span>
+                                                </td>
+                                                <td style="width: 50%; text-align: right;">
+                                                    <t t-set="active_days" t-value="0"/>
+                                                    <t t-if="timetable.mon_timetable_ids"><t t-set="active_days" t-value="active_days + 1"/></t>
+                                                    <t t-if="timetable.tue_timetable_ids"><t t-set="active_days" t-value="active_days + 1"/></t>
+                                                    <t t-if="timetable.wed_timetable_ids"><t t-set="active_days" t-value="active_days + 1"/></t>
+                                                    <t t-if="timetable.thur_timetable_ids"><t t-set="active_days" t-value="active_days + 1"/></t>
+                                                    <t t-if="timetable.fri_timetable_ids"><t t-set="active_days" t-value="active_days + 1"/></t>
+                                                    <t t-if="timetable.sat_timetable_ids"><t t-set="active_days" t-value="active_days + 1"/></t>
+                                                    <t t-esc="active_days"/> من 6 : <span style="font-weight: bold; color: #27ae60;">الأيام الفعالة</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: right;">
+                                                    <t t-if="total_lectures > 0">
+                                                        <t t-esc="round(total_lectures / 6, 1)"/> : <span style="font-weight: bold; color: #e74c3c;">متوسط المحاضرات يومياً</span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        0 : <span style="font-weight: bold; color: #e74c3c;">متوسط المحاضرات يومياً</span>
+                                                    </t>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <t t-set="unique_courses" t-value="set()"/>
+                                                    <t t-foreach="timetable.mon_timetable_ids + timetable.tue_timetable_ids + timetable.wed_timetable_ids + timetable.thur_timetable_ids + timetable.fri_timetable_ids + timetable.sat_timetable_ids" t-as="lecture">
+                                                        <t t-set="dummy" t-value="unique_courses.add(lecture.course_id.id)"/>
+                                                    </t>
+                                                    <t t-esc="len(unique_courses)"/> : <span style="font-weight: bold; color: #9b59b6;">عدد المواد</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- ملاحظة تذييل -->
+                            <div class="mt-4" style="text-align: center; color: #7f8c8d; font-style: italic; border-top: 1px solid #bdc3c7; padding-top: 15px;">
+                                 يرجى مراجعة الجدول بانتظام للتأكد من عدم وجود تضارب في المواعيد
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <!-- تعريف التقرير نفسه -->
+        <record id="action_report_university_timetable" model="ir.actions.report">
+            <field name="name">تقرير جدول المحاضرات</field>
+            <field name="model">university.timetable</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">education_university_management.report_university_timetable</field>
+            <field name="report_file">education_university_management.report_university_timetable</field>
+            <field name="binding_model_id" ref="model_university_timetable"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

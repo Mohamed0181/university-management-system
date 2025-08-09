@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- قالب تقرير نتائج الطلاب المحسن -->
+        <template id="report_exam_valuation_pdf" name="Student Results Report PDF">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: 'Lato', sans-serif; direction: rtl; color: #1e293b;">
+                        <t t-foreach="docs" t-as="valuation">
+
+                            <!-- رأس التقرير -->
+                            <div style="background-color: #1e3a8a; color: white; padding: 20px; text-align: center; margin-bottom: 20px;">
+                                <h1 style="margin: 0; font-size: 24px;">تقرير نتائج الطلاب</h1>
+                                <h2 style="margin: 10px 0 0 0; font-size: 18px;">
+                                    <span t-field="valuation.name"/>
+                                </h2>
+                            </div>
+
+                            <!-- معلومات الامتحان -->
+                            <table style="width: 100%; margin-bottom: 30px; border: 1px solid #cbd5e1; border-collapse: collapse; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">الكلية</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">
+                                        <span t-field="valuation.college_id.name"/>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">الدفعة</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">
+                                        <span t-field="valuation.batch_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">السنة الأكاديمية</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">
+                                        <span t-field="valuation.academic_year_id.name"/>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">المادة</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">
+                                        <span t-field="valuation.course_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">الامتحان</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">
+                                        <span t-field="valuation.exam_id.name"/>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">الممتحن</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">
+                                        <span t-field="valuation.evaluator_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">التاريخ</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">
+                                        <span t-field="valuation.date" t-options='{"format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">الدرجة القصوى</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">
+                                        <span t-field="valuation.mark"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;">درجة النجاح</td>
+                                    <td style="padding: 10px; border: 1px solid #cbd5e1;" colspan="3">
+                                        <span t-field="valuation.pass_mark"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- جدول النتائج -->
+                            <h3 style="margin-bottom: 10px;">نتائج الطلاب:</h3>
+                            <table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; font-size: 13px;">
+                                <thead style="background-color: #3b82f6; color: white;">
+                                    <tr>
+                                        <th style="padding: 10px; border: 1px solid #e2e8f0;">م</th>
+                                        <th style="padding: 10px; border: 1px solid #e2e8f0;">اسم الطالب</th>
+                                        <th style="padding: 10px; border: 1px solid #e2e8f0;">الدرجة المحصلة</th>
+                                        <th style="padding: 10px; border: 1px solid #e2e8f0;">النسبة المئوية</th>
+                                        <th style="padding: 10px; border: 1px solid #e2e8f0;">النتيجة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="counter" t-value="0"/>
+                                    <t t-foreach="valuation.valuation_line_ids" t-as="line">
+                                        <t t-set="counter" t-value="counter + 1"/>
+                                        <tr t-attf-style="background-color: #{'f0f0f0' if counter % 2 == 0 else 'ffffff'};">
+                                            <td style="padding: 8px; text-align: center;">
+                                                <t t-esc="counter"/>
+                                            </td>
+                                            <td style="padding: 8px;">
+                                                <span t-field="line.student_id.name"/>
+                                            </td>
+                                            <td style="padding: 8px; text-align: center;">
+                                                <span t-field="line.mark_scored"/>
+                                                /
+                                                <span t-field="valuation.mark"/>
+                                            </td>
+                                            <td style="padding: 8px; text-align: center;"><t
+                                                    t-esc="round((line.mark_scored / valuation.mark) * 100, 1)"/>%
+                                            </td>
+                                            <td style="padding: 8px; text-align: center;">
+                                                <t t-if="line.is_pass">ناجح</t>
+                                                <t t-else="">راسب</t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                            <!-- إحصائيات -->
+                            <div style="margin-top: 30px; font-size: 14px;">
+                                <p>إجمالي الطلاب:
+                                    <t t-esc="len(valuation.valuation_line_ids)"/>
+                                </p>
+                                <p>عدد الناجحين:
+                                    <t t-esc="len([line for line in valuation.valuation_line_ids if line.is_pass])"/>
+                                </p>
+                                <p>عدد الراسبين:
+                                    <t t-esc="len([line for line in valuation.valuation_line_ids if not line.is_pass])"/>
+                                </p>
+                                <p>
+                                    نسبة النجاح:
+                                    <t t-if="len(valuation.valuation_line_ids) > 0">
+                                        <t t-esc="round((len([line for line in valuation.valuation_line_ids if line.is_pass]) / len(valuation.valuation_line_ids)) * 100, 1)"/>
+                                        %
+                                    </t>
+                                    <t t-else="">0%</t>
+                                </p>
+                            </div>
+
+                            <!-- التوقيع -->
+                            <div style="margin-top: 40px; font-size: 13px;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="text-align: center;">
+                                            مسئول الكنترول
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                            الاسم: ____________
+                                            <br/>
+                                            التوقيع: ____________
+                                        </td>
+                                        <td style="text-align: center;">
+                                            رئيس الكنترول
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                            الاسم: ____________
+                                            <br/>
+                                            التوقيع: ____________
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- الذيل -->
+                            <div style="text-align: center; font-size: 12px; margin-top: 40px; border-top: 1px solid #ddd; padding-top: 10px;">
+                                تم إصدار التقرير بتاريخ:
+                                <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y %H:%M')"/>
+                            </div>
+
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+
+        <!-- تعريف التقرير نفسه -->
+        <record id="action_report_exam_valuation" model="ir.actions.report">
+            <field name="name">تقرير نتائج الطلاب</field>
+            <field name="model">exam.valuation</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">education_university_management.report_exam_valuation_pdf</field>
+            <field name="report_file">education_university_management.report_exam_valuation_pdf</field>
+            <field name="binding_model_id" ref="model_exam_valuation"/>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>

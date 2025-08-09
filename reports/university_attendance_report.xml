@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_university_attendance" name="Professional Student Attendance Report">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <style>
+                        .report-header {
+                            background-color: #667eea;
+                            color: white;
+                            padding: 20px;
+                            border: 1px solid #ccc;
+                            margin-bottom: 20px;
+                            text-align: center;
+                        }
+
+                        .report-title {
+                            font-size: 22px;
+                            font-weight: bold;
+                        }
+
+                        .report-subtitle {
+                            font-size: 14px;
+                            margin-top: 5px;
+                        }
+
+                        .info-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                            font-size: 12px;
+                        }
+
+                        .info-table td {
+                            padding: 8px;
+                            border: 1px solid #ddd;
+                        }
+
+                        .stat-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                            text-align: center;
+                            font-size: 13px;
+                        }
+
+                        .stat-table td {
+                            padding: 10px;
+                            border: 1px solid #ccc;
+                        }
+
+                        .attendance-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 12px;
+                        }
+
+                        .attendance-table th, .attendance-table td {
+                            border: 1px solid #ccc;
+                            padding: 8px;
+                            text-align: center;
+                        }
+
+                        .status-present {
+                            background-color: #10b981;
+                            color: white;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                        }
+
+                        .status-absent {
+                            background-color: #ef4444;
+                            color: white;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                        }
+
+                        .status-unknown {
+                            background-color: #f59e0b;
+                            color: white;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                        }
+
+                        .signature-table {
+                            width: 100%;
+                            margin-top: 40px;
+                            font-size: 12px;
+                            text-align: center;
+                        }
+
+                        .signature-box {
+                            border: 1px dashed #aaa;
+                            padding: 20px;
+                            height: 100px;
+                        }
+
+                        .page-break {
+                            page-break-after: always;
+                        }
+                    </style>
+
+                    <t t-foreach="docs" t-as="attendance">
+                        <div class="report-header">
+                            <div class="report-title">تقرير الحضور والغياب</div>
+                            <div class="report-subtitle" t-esc="attendance.name"/>
+                        </div>
+
+                        <table class="info-table">
+                            <tr>
+                                <td><strong>الكلية:</strong></td>
+                                <td t-esc="attendance.college_id.name or 'غير محدد'"/>
+                                <td><strong>القسم:</strong></td>
+                                <td t-esc="attendance.department_id.name or 'غير محدد'"/>
+                            </tr>
+                            <tr>
+                                <td><strong>المادة:</strong></td>
+                                <td t-esc="attendance.course_id.name or 'غير محدد'"/>
+                                <td><strong>الدفعة:</strong></td>
+                                <td t-esc="attendance.batch_id.name or 'غير محدد'"/>
+                            </tr>
+                            <tr>
+                                <td><strong>التاريخ:</strong></td>
+                                <td t-esc="attendance.date"/>
+                                <td><strong>وقت التقرير:</strong></td>
+                                <td t-esc="datetime.datetime.now().strftime('%d/%m/%Y %H:%M')"/>
+                            </tr>
+                        </table>
+
+                        <t t-set="total_students" t-value="len(attendance.attendance_line_ids)"/>
+                        <t t-set="present_students" t-value="len(attendance.attendance_line_ids.filtered(lambda x: x.status == 'present'))"/>
+                        <t t-set="absent_students" t-value="len(attendance.attendance_line_ids.filtered(lambda x: x.status == 'absent'))"/>
+                        <t t-set="attendance_percentage" t-value="round((present_students * 100 / total_students) if total_students > 0 else 0, 1)"/>
+
+                        <table class="stat-table">
+                            <tr>
+                                <td><strong>إجمالي الطلاب</strong></td>
+                                <td><strong>الحاضرون</strong></td>
+                                <td><strong>الغائبون</strong></td>
+                                <td><strong>نسبة الحضور</strong></td>
+                            </tr>
+                            <tr>
+                                <td t-esc="total_students"/>
+                                <td t-esc="present_students"/>
+                                <td t-esc="absent_students"/>
+                                <td><span t-esc="attendance_percentage"/>%</td>
+                            </tr>
+                        </table>
+
+                        <table class="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>اسم الطالب</th>
+                                    <th>الدفعة</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="attendance.attendance_line_ids">
+                                    <t t-set="counter" t-value="0"/>
+                                    <t t-foreach="attendance.attendance_line_ids" t-as="line">
+                                        <t t-set="counter" t-value="counter + 1"/>
+                                        <tr>
+                                            <td t-esc="counter"/>
+                                            <td t-esc="line.student_id.name"/>
+                                            <td t-esc="line.batch_id.name or 'غير محدد'"/>
+                                            <td t-esc="line.date"/>
+                                            <td>
+                                                <t t-if="line.status == 'present'">
+                                                    <span class="status-present">حاضر</span>
+                                                </t>
+                                                <t t-elif="line.status == 'absent'">
+                                                    <span class="status-absent">غائب</span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="status-unknown">غير محدد</span>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <tr>
+                                        <td colspan="5">لا توجد بيانات حضور</td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <table class="signature-table">
+                            <tr>
+                                <td class="signature-box">مسؤول الحضور<br/><br/>التوقيع والتاريخ</td>
+                                <td class="signature-box">رئيس القسم<br/><br/>التوقيع والتاريخ</td>
+                            </tr>
+                        </table>
+
+                        <t t-if="not attendance_last">
+                            <div class="page-break"/>
+                        </t>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_university_attendance" model="ir.actions.report">
+        <field name="name">تقرير الحضور والغياب</field>
+        <field name="model">university.attendance</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">education_university_management.report_university_attendance</field>
+        <field name="report_file">education_university_management.report_university_attendance</field>
+        <field name="binding_model_id" ref="model_university_attendance"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
