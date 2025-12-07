@@ -1,6 +1,6 @@
 {
     'name': ' University Management System',
-    'version': '18.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Education',
     'summary': """This modules helps to manage the university 
      management system""",
